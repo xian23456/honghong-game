@@ -203,7 +203,7 @@ function HomePage({ onStart, isLoading }: { onStart: () => void; isLoading: bool
         </div>
 
         {/* Title */}
-        <h1 className="text-3xl font-bold text-red-600 mb-3">
+        <h1 className="text-3xl font-bold text-gray-800 mb-3">
           哄哄模拟器
         </h1>
         <p className="text-gray-500 text-sm leading-relaxed mb-2">
