@@ -29,11 +29,6 @@ export default async function BlogPage() {
           </p>
         </div>
 
-        {/* Generate Button */}
-        <div className="mb-4">
-          <GenerateButton />
-        </div>
-
         {/* Articles */}
         <div className="space-y-4">
           {posts.map((post) => (
