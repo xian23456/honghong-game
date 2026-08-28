@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getAllPosts } from "@/lib/blog-data";
+import { GenerateButton } from "@/components/generate-button";
 
 export const dynamic = "force-dynamic";
 
@@ -26,6 +27,11 @@ export default async function BlogPage() {
           <p className="mt-2 text-sm text-stone-400">
             帮你少走弯路的恋爱沟通技巧
           </p>
+        </div>
+
+        {/* Generate Button */}
+        <div className="mb-4">
+          <GenerateButton />
         </div>
 
         {/* Articles */}

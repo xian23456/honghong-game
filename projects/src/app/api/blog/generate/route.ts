@@ -1,7 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { LLMClient, Config } from "coze-coding-dev-sdk";
 import { insertPost } from "@/lib/blog-data";
-import { verifyToken } from "@/lib/auth";
 
 export const runtime = "nodejs";
 
@@ -23,15 +22,8 @@ const TOPICS = [
   "对方生气时最不该说的五句话",
 ];
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
-    // 仅登录用户可生成
-    const token = request.cookies.get("auth_token")?.value;
-    const payload = token ? await verifyToken(token) : null;
-    if (!payload) {
-      return NextResponse.json({ error: "请先登录后再生成攻略" }, { status: 401 });
-    }
-
     const config = new Config();
     const llm = new LLMClient(config);
 
