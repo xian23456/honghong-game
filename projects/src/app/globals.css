@@ -240,6 +240,16 @@ html {
   display: inline-block;
 }
 
+/* 绿色胶囊高亮：用于标题中的关键词 */
+.highlight-green {
+  background-color: #16a34a;
+  color: #ffffff;
+  border-radius: 9999px;
+  padding: 0.2em 0.65em;
+  white-space: nowrap;
+  display: inline-block;
+}
+
 /* Scrollbar styling */
 .custom-scrollbar::-webkit-scrollbar {
   width: 4px;

@@ -206,7 +206,7 @@ function HomePage({ onStart, isLoading }: { onStart: () => void; isLoading: bool
 
         {/* Title */}
         <h1 className="font-display text-3xl text-gray-900 mb-3">
-          <span className="highlight-rose">哄哄</span>模拟器
+          <span className="highlight-green">哄哄</span>模拟器
         </h1>
         <p className="text-gray-500 text-sm leading-relaxed mb-2 font-semibold">
           AI 情景练习小游戏
