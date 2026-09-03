@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSupabaseClient } from "@/storage/database/supabase-client";
+import { eq } from "drizzle-orm";
+import { db } from "@/storage/database/db";
+import { users } from "@/storage/database/shared/schema";
 import { verifyPassword, generateToken, setAuthCookie } from "@/lib/auth";
 
 export async function POST(request: NextRequest) {
@@ -13,23 +15,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = getSupabaseClient();
-
     // Find user
-    const { data: users } = await supabase
-      .from("users")
-      .select("id, username, password")
-      .eq("username", username)
+    const [user] = await db
+      .select({
+        id: users.id,
+        username: users.username,
+        password: users.password,
+      })
+      .from(users)
+      .where(eq(users.username, username))
       .limit(1);
 
-    if (!users || users.length === 0) {
+    if (!user) {
       return NextResponse.json(
         { error: "用户名或密码错误" },
         { status: 401 }
       );
     }
-
-    const user = users[0];
 
     // Verify password
     const isValid = await verifyPassword(password, user.password);

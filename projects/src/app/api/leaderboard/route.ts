@@ -1,26 +1,34 @@
 import { NextResponse } from "next/server";
-import { getSupabaseClient } from "@/storage/database/supabase-client";
+import { asc, eq } from "drizzle-orm";
+import { db } from "@/storage/database/db";
+import { gameRecords, users } from "@/storage/database/shared/schema";
 
 export async function GET() {
   try {
-    const supabase = getSupabaseClient();
-    const { data, error } = await supabase
-      .from("game_records")
-      .select("id, user_id, scenario, final_score, result, played_at, users(username)")
-      .eq("result", "success")
-      .order("final_score", { ascending: true })
+    const rows = await db
+      .select({
+        userId: gameRecords.userId,
+        username: users.username,
+        scenario: gameRecords.scenario,
+        rounds: gameRecords.rounds,
+        result: gameRecords.result,
+        playedAt: gameRecords.playedAt,
+      })
+      .from(gameRecords)
+      .innerJoin(users, eq(gameRecords.userId, users.id))
+      .where(eq(gameRecords.result, "success"))
+      // 轮数越少排名越靠前；轮数相同时先通关的排前面
+      .orderBy(asc(gameRecords.rounds), asc(gameRecords.playedAt))
       .limit(20);
 
-    if (error) throw error;
-
-    const leaderboard = (data ?? []).map((record: Record<string, unknown>, index: number) => ({
+    const leaderboard = rows.map((record, index) => ({
       rank: index + 1,
-      userId: record.user_id,
-      username: (record.users as Record<string, unknown>)?.username ?? "匿名",
+      userId: record.userId,
+      username: record.username ?? "匿名",
       scenario: record.scenario,
-      score: record.final_score,
+      rounds: record.rounds,
       result: record.result,
-      playedAt: record.played_at,
+      playedAt: record.playedAt,
     }));
 
     return NextResponse.json({ leaderboard });

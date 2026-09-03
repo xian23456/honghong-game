@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { LLMClient, Config, HeaderUtils } from 'coze-coding-dev-sdk';
+import { arkChat } from '@/lib/ark-llm';
 import type { Message, ReviewResponse } from '@/app/types';
 
 function buildReviewPrompt(
@@ -70,10 +70,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    const customHeaders = HeaderUtils.extractForwardHeaders(request.headers);
-    const config = new Config();
-    const client = new LLMClient(config, customHeaders);
-
     // Build conversation text for the prompt
     const conversationText = messages
       .map((msg) => {
@@ -87,13 +83,9 @@ export async function POST(request: NextRequest) {
       { role: 'user' as const, content: `以下是完整聊天记录：\n\n${conversationText}\n\n请给出复盘分析。` },
     ];
 
-    const response = await client.invoke(llmMessages, {
-      model: 'doubao-seed-2-0-lite-260215',
-      temperature: 0.7,
-    });
+    const content = await arkChat(llmMessages, { temperature: 0.7 });
 
-    const content = response.content.trim();
-    const jsonMatch = content.match(/\{[\s\S]*\}/);
+    const jsonMatch = content.trim().match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
       throw new Error('Failed to parse review from LLM response');
     }

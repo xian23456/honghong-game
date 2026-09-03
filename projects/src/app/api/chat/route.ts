@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { LLMClient, TTSClient, Config, HeaderUtils } from 'coze-coding-dev-sdk';
+import { byteTts } from '@/lib/byte-tts';
+import { arkChat } from '@/lib/ark-llm';
 import { generateFallbackReply, resolveGameResult } from '@/lib/fallback-game';
 import type { Message, ChatResponse } from '@/app/types';
 
@@ -86,9 +87,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    const customHeaders = HeaderUtils.extractForwardHeaders(request.headers);
-    const config = new Config();
-
     // Determine current emotion based on anger level
     let currentEmotion = '';
     if (angerLevel >= 75) currentEmotion = '非常生气';
@@ -112,23 +110,40 @@ export async function POST(request: NextRequest) {
     // Add current user message
     llmMessages.push({ role: 'user' as const, content: userMessage });
 
-    // Call LLM；失败时使用简单规则模式兜底
+    // Call LLM（火山方舟 Ark，自备密钥）；失败时使用简单规则模式兜底
     let chatData: Pick<ChatResponse, 'reply' | 'angerChange' | 'newAngerLevel' | 'emotion' | 'emotionIntensity'>;
     let llmAvailable = true;
     try {
-      const llmClient = new LLMClient(config, customHeaders);
-      const llmResponse = await llmClient.invoke(llmMessages, {
-        model: 'doubao-seed-2-0-lite-260215',
-        temperature: 0.85,
-      });
+      // 最多尝试 2 次：推理模型偶尔输出空内容或不按 JSON 格式，重试可显著降低失败率
+      let parsed: ChatResponse | null = null;
+      for (let attempt = 0; attempt < 2 && !parsed; attempt++) {
+        const requestMessages =
+          attempt === 0
+            ? llmMessages
+            : [
+                ...llmMessages,
+                { role: 'assistant' as const, content: '……' },
+                {
+                  role: 'user' as const,
+                  content: '请严格按照要求的JSON格式重新输出回复，不要输出任何其他内容。',
+                },
+              ];
 
-      const content = llmResponse.content.trim();
-      const jsonMatch = content.match(/\{[\s\S]*\}/);
-      if (!jsonMatch) {
+        const content = await arkChat(requestMessages, {
+          temperature: attempt === 0 ? 0.85 : 0.7,
+        });
+
+        const jsonMatch = content.trim().match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          parsed = JSON.parse(jsonMatch[0]) as ChatResponse;
+        }
+      }
+
+      if (!parsed) {
         throw new Error('Failed to parse chat response from LLM');
       }
 
-      chatData = JSON.parse(jsonMatch[0]) as ChatResponse;
+      chatData = parsed;
     } catch (llmError) {
       console.error('LLM unavailable, using rule-based fallback:', llmError);
       chatData = generateFallbackReply(userMessage, angerLevel);
@@ -142,22 +157,16 @@ export async function POST(request: NextRequest) {
     const newRound = round + 1;
     const { gameEnded, gameResult } = resolveGameResult(newAngerLevel, newRound);
 
-    // Generate TTS（规则模式下跳过）
+    // Generate TTS（火山 OpenSpeech seed-audio，自备密钥；规则模式下跳过）
     let audioUrl = '';
     if (llmAvailable) {
       try {
-        const ttsClient = new TTSClient(config, customHeaders);
         const { speechRate, loudnessRate } = getTTSParams(newAngerLevel);
-        const ttsResponse = await ttsClient.synthesize({
-          uid: `game-${Date.now()}`,
-          text: chatData.reply,
-          speaker: 'zh_female_meilinvyou_saturn_bigtts',
-          audioFormat: 'mp3',
-          sampleRate: 24000,
+        audioUrl = await byteTts(chatData.reply, {
           speechRate,
           loudnessRate,
+          tone: currentEmotion,
         });
-        audioUrl = ttsResponse.audioUri;
       } catch (ttsError) {
         console.error('TTS generation failed:', ttsError);
         // Continue without audio - it's not critical

@@ -1,0 +1,99 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------
+   Design tokens
+   cleanup.pictures 主色是荧光黄绿 #BDFF01，整站只有黑 / 白 / 灰 + 主色
+   --------------------------------------------------------------- */
+@theme {
+  --color-primary: #bdff01;
+  --color-primary-foreground: #000000;
+
+  --color-background: #ffffff;
+  --color-foreground: #000000;
+  --color-muted: #f3f4f6;
+  --color-muted-foreground: #6b7280;
+  --color-border: rgba(0, 0, 0, 0.1);
+
+  --font-sans: Inter, "Helvetica Neue", Helvetica, Arial, "PingFang SC",
+    "Microsoft YaHei", sans-serif;
+  --font-display: Inter, "Helvetica Neue", Helvetica, Arial, "PingFang SC",
+    "Microsoft YaHei", sans-serif;
+
+  --radius-pill: 9999px;
+
+  /* Radix Accordion 的展开 / 收起动画 */
+  --animate-accordion-down: accordion-down 220ms cubic-bezier(0.4, 0, 0.2, 1);
+  --animate-accordion-up: accordion-up 220ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes accordion-down {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+  }
+}
+
+@keyframes accordion-up {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    height: 0;
+  }
+}
+
+/* ---------------------------------------------------------------
+   Base
+   --------------------------------------------------------------- */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    font-weight: 600;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* 原站标题用的 VarentGrotesk 是付费字体，这里用 800 字重 + 收紧字距替代 */
+  .font-display {
+    font-family: var(--font-display);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+
+  h1,
+  h2 {
+    font-weight: 800;
+  }
+}
+
+/* ---------------------------------------------------------------
+   Utilities
+   --------------------------------------------------------------- */
+/* 标题里的黑色胶囊高亮（文字颜色由 text-* 决定，原站就是这么干的） */
+@utility highlight {
+  background-color: #000000;
+  border-radius: var(--radius-pill);
+  padding: 0.25rem 1rem;
+  white-space: nowrap;
+}
+
+/* 正文里的主色胶囊高亮 */
+@utility marker {
+  background-color: var(--color-primary);
+  border-radius: var(--radius-pill);
+  padding: 0.125rem 0.5rem;
+  white-space: nowrap;
+}
+
+/* 编辑器里禁止选中文字，避免涂抹时误选 */
+@utility no-select {
+  user-select: none;
+  -webkit-user-select: none;
+}

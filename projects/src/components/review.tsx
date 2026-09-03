@@ -52,7 +52,7 @@ export default function Review({
         {/* Result header */}
         <div className="text-center mb-8 animate-fade-in">
           <div className="text-6xl mb-4">{resultInfo.emoji}</div>
-          <h1 className="text-2xl font-bold text-gray-800 mb-2">{resultInfo.title}</h1>
+          <h1 className="font-display text-2xl text-gray-900 mb-2">{resultInfo.title}</h1>
           <p className="text-gray-500 text-sm">{resultInfo.subtitle}</p>
         </div>
 

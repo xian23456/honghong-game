@@ -8,7 +8,7 @@ interface LeaderboardEntry {
   userId: number;
   username: string;
   scenario: string;
-  score: number;
+  rounds: number;
   result: string;
   playedAt: string;
 }
@@ -52,8 +52,10 @@ export default function LeaderboardPage() {
       <div className="max-w-lg mx-auto px-4 py-6">
         <div className="text-center mb-6">
           <div className="text-3xl mb-1">🏆</div>
-          <h1 className="text-xl font-bold text-gray-800">排行榜</h1>
-          <p className="text-xs text-gray-400 mt-1">通关成功 · 按好感度分数排名 · 前20名</p>
+          <h1 className="font-display text-xl text-gray-900">
+            <span className="highlight-dark">排行榜</span>
+          </h1>
+          <p className="text-xs text-gray-400 mt-2">通关成功 · 轮数越少排名越靠前 · 前20名</p>
         </div>
 
         {loading ? (
@@ -100,7 +102,7 @@ export default function LeaderboardPage() {
                   </div>
                   <div className="text-right">
                     <div className={`text-sm font-bold ${isTop3 ? "text-amber-500" : "text-gray-600"}`}>
-                      {entry.score}
+                      {entry.rounds} 轮
                     </div>
                     <div className="text-[10px] text-gray-300">{formatTime(entry.playedAt)}</div>
                   </div>
