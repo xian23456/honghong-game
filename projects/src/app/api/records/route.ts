@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSupabaseClient } from "@/storage/database/supabase-client";
+import { db } from "@/storage/database/db";
+import { gameRecords } from "@/storage/database/shared/schema";
 import { verifyToken } from "@/lib/auth";
 
 export async function POST(request: NextRequest) {
@@ -15,21 +16,18 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { scenario, finalScore, result } = body;
+    const { scenario, rounds, result } = body;
 
-    if (!scenario || finalScore === undefined || !result) {
+    if (!scenario || typeof rounds !== 'number' || rounds < 1 || !result) {
       return NextResponse.json({ error: "参数不完整" }, { status: 400 });
     }
 
-    const supabase = getSupabaseClient();
-    const { error } = await supabase.from("game_records").insert({
-      user_id: payload.userId,
+    await db.insert(gameRecords).values({
+      userId: payload.userId,
       scenario,
-      final_score: finalScore,
+      rounds,
       result,
     });
-
-    if (error) throw error;
 
     return NextResponse.json({ success: true });
   } catch (err) {

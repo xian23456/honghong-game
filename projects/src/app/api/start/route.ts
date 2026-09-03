@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { LLMClient, Config, HeaderUtils } from 'coze-coding-dev-sdk';
+import { arkChat } from '@/lib/ark-llm';
 import { FALLBACK_SCENARIO } from '@/lib/fallback-game';
 import type { StartResponse } from '@/app/types';
 
@@ -33,10 +33,6 @@ const SYSTEM_PROMPT = `你是一个情景生成器，用于"哄哄模拟器"游�
 
 export async function POST(request: NextRequest) {
   try {
-    const customHeaders = HeaderUtils.extractForwardHeaders(request.headers);
-    const config = new Config();
-    const client = new LLMClient(config, customHeaders);
-
     const messages = [
       { role: 'system' as const, content: SYSTEM_PROMPT },
       { role: 'user' as const, content: '请随机生成一个情侣矛盾场景，每次都要不一样。' },
@@ -44,14 +40,10 @@ export async function POST(request: NextRequest) {
 
     let scenarioData: StartResponse;
     try {
-      const response = await client.invoke(messages, {
-        model: 'doubao-seed-2-0-lite-260215',
-        temperature: 1.0,
-      });
+      const content = await arkChat(messages, { temperature: 1.0 });
 
-      const content = response.content.trim();
       // Extract JSON from the response
-      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      const jsonMatch = content.trim().match(/\{[\s\S]*\}/);
       if (!jsonMatch) {
         throw new Error('Failed to parse scenario from LLM response');
       }

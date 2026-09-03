@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { LLMClient, Config } from "coze-coding-dev-sdk";
+import { arkChat } from "@/lib/ark-llm";
 import { insertPost } from "@/lib/blog-data";
 
 export const runtime = "nodejs";
@@ -24,9 +24,6 @@ const TOPICS = [
 
 export async function POST() {
   try {
-    const config = new Config();
-    const llm = new LLMClient(config);
-
     // Pick a random topic
     const topic = TOPICS[Math.floor(Math.random() * TOPICS.length)];
 
@@ -35,15 +32,13 @@ export async function POST() {
 文章结构：开头用一个小场景引入 → 分析常见误区 → 给出实用建议 → 温暖收尾。
 每篇300-500字，用中文。不要输出markdown格式标记（如#、**等），直接用纯文本和换行分段。`;
 
-    const response = await llm.invoke(
+    const content = await arkChat(
       [
         { role: "system", content: systemPrompt },
         { role: "user", content: `请写一篇关于「${topic}」的恋爱攻略文章。文章标题要有吸引力，可以用问句或者反转式表达。` },
       ],
-      { model: "doubao-seed-2-0-lite-260215", temperature: 0.85 }
+      { temperature: 0.85 }
     );
-
-    const content = response.content;
 
     // Extract title from first line or generate one
     const lines = content.split("\n").filter((l: string) => l.trim());

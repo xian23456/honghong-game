@@ -6,7 +6,7 @@ import Link from "next/link";
 interface GameRecord {
   id: number;
   scenario: string;
-  final_score: number;
+  rounds: number;
   result: string;
   played_at: string;
 }
@@ -74,7 +74,7 @@ export default function ProfilePage() {
   }
 
   const successCount = records.filter((r) => r.result === "success").length;
-  const bestScore = records.filter((r) => r.result === "success").reduce((min, r) => Math.min(min, r.final_score), 100);
+  const bestRounds = records.filter((r) => r.result === "success").reduce((min, r) => Math.min(min, r.rounds), Infinity);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 via-rose-50 to-pink-50">
@@ -99,8 +99,8 @@ export default function ProfilePage() {
             <div className="text-[10px] text-gray-400">通关次数</div>
           </div>
           <div className="bg-white/60 rounded-2xl p-3 text-center">
-            <div className="text-lg font-bold text-amber-500">{successCount > 0 ? bestScore : "-"}</div>
-            <div className="text-[10px] text-gray-400">最高分数</div>
+            <div className="text-lg font-bold text-amber-500">{successCount > 0 ? `${bestRounds} 轮` : "-"}</div>
+            <div className="text-[10px] text-gray-400">最少轮数通关</div>
           </div>
         </div>
 
@@ -131,7 +131,7 @@ export default function ProfilePage() {
                     <span className={`text-[10px] px-2 py-0.5 rounded-full ${resultInfo.color}`}>
                       {resultInfo.text}
                     </span>
-                    <span className="text-sm font-bold text-gray-600">{record.final_score}</span>
+                    <span className="text-sm font-bold text-gray-600">{record.rounds} 轮</span>
                   </div>
                 </div>
               );

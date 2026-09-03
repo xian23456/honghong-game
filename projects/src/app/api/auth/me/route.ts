@@ -6,5 +6,6 @@ export async function GET() {
   if (!user) {
     return NextResponse.json({ error: "未登录" }, { status: 401 });
   }
-  return NextResponse.json({ user });
+  // 与 login/register 返回格式保持一致：{ user: { id, username } }
+  return NextResponse.json({ user: { id: user.userId, username: user.username } });
 }

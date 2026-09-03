@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSupabaseClient } from "@/storage/database/supabase-client";
+import { desc, eq } from "drizzle-orm";
+import { db } from "@/storage/database/db";
+import { gameRecords, users } from "@/storage/database/shared/schema";
 
 export async function GET(_request: NextRequest, { params }: { params: Promise<{ userId: string }> }) {
   try {
@@ -9,29 +11,34 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
       return NextResponse.json({ error: "无效的用户ID" }, { status: 400 });
     }
 
-    const supabase = getSupabaseClient();
+    const [user] = await db
+      .select({
+        id: users.id,
+        username: users.username,
+        createdAt: users.createdAt,
+      })
+      .from(users)
+      .where(eq(users.id, uid));
 
-    const { data: user, error: userError } = await supabase
-      .from("users")
-      .select("id, username, created_at")
-      .eq("id", uid)
-      .single();
-
-    if (userError || !user) {
+    if (!user) {
       return NextResponse.json({ error: "用户不存在" }, { status: 404 });
     }
 
-    const { data: records, error: recordsError } = await supabase
-      .from("game_records")
-      .select("id, scenario, final_score, result, played_at")
-      .eq("user_id", uid)
-      .order("played_at", { ascending: false });
-
-    if (recordsError) throw recordsError;
+    const records = await db
+      .select({
+        id: gameRecords.id,
+        scenario: gameRecords.scenario,
+        rounds: gameRecords.rounds,
+        result: gameRecords.result,
+        playedAt: gameRecords.playedAt,
+      })
+      .from(gameRecords)
+      .where(eq(gameRecords.userId, uid))
+      .orderBy(desc(gameRecords.playedAt));
 
     return NextResponse.json({
-      user: { id: user.id, username: user.username, createdAt: user.created_at },
-      records: records ?? [],
+      user: { id: user.id, username: user.username, createdAt: user.createdAt },
+      records,
     });
   } catch (err) {
     console.error("Failed to fetch user profile:", err);

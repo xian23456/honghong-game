@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1788249572761,
+      "tag": "0000_add_boyfriend_tables",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1788251019182,
+      "tag": "0001_add_user_role_status",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1788262953237,
+      "tag": "0002_add_game_rounds",
+      "breakpoints": true
+    }
+  ]
+}

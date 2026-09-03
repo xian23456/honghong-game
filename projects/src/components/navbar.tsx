@@ -23,13 +23,15 @@ export function Navbar() {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-rose-100">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-black/5">
       <div className="max-w-lg mx-auto px-4 h-12 flex items-center justify-between">
-        <Link href="/" className="text-base font-bold text-red-600">
-          哄哄模拟器
+        <Link href="/" className="flex items-center">
+          <span className="font-display text-sm bg-gray-900 text-white rounded-full px-3 py-1">
+            哄哄模拟器
+          </span>
         </Link>
         <div className="flex items-center gap-3">
-          <Link href="/leaderboard" className="text-xs text-gray-500 hover:text-rose-500 transition-colors">
+          <Link href="/leaderboard" className="text-xs font-medium text-gray-500 hover:text-rose-500 transition-colors">
             排行榜
           </Link>
           {loading ? null : username ? (

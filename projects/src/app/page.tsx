@@ -112,12 +112,14 @@ export default function Home() {
     if (userId) {
       try {
         const recordResult = result === 'success' ? 'success' : result === 'failure' ? 'failure' : 'ended';
+        // 轮数 = 用户发送的消息数
+        const rounds = messages.filter((m) => m.role === 'user').length;
         await fetch('/api/records', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             scenario,
-            finalScore: _angerLevel,
+            rounds,
             result: recordResult,
           }),
         });
@@ -203,22 +205,22 @@ function HomePage({ onStart, isLoading }: { onStart: () => void; isLoading: bool
         </div>
 
         {/* Title */}
-        <h1 className="text-3xl font-bold text-red-600 mb-3">
-          哄哄模拟器
+        <h1 className="font-display text-3xl text-gray-900 mb-3">
+          <span className="highlight-rose">哄哄</span>模拟器
         </h1>
-        <p className="text-gray-500 text-sm leading-relaxed mb-2">
+        <p className="text-gray-500 text-sm leading-relaxed mb-2 font-semibold">
           AI 情景练习小游戏
         </p>
         <p className="text-gray-400 text-xs leading-relaxed mb-10 max-w-xs mx-auto">
           模拟真实情侣聊天场景，练习如何理解对方情绪、进行有效沟通。
-          让她的愤怒值降到 0，你能做到吗？
+          让她的愤怒值降到 <span className="marker-rose px-1.5 py-0.5 rounded-full bg-rose-100 text-rose-600 font-semibold">0</span>，你能做到吗？
         </p>
 
         {/* Start button */}
         <button
           onClick={onStart}
           disabled={isLoading}
-          className="w-full py-4 px-8 bg-gradient-to-r from-pink-500 to-rose-500 text-white text-lg font-semibold rounded-2xl shadow-lg shadow-pink-300/40 hover:shadow-xl hover:shadow-pink-300/60 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
+          className="w-full py-4 px-8 bg-gradient-to-r from-pink-500 to-rose-500 text-white text-lg font-bold rounded-full shadow-lg shadow-pink-300/40 hover:shadow-xl hover:shadow-pink-300/60 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
         >
           {isLoading ? (
             <span className="flex items-center justify-center gap-2">
@@ -256,7 +258,7 @@ function HomePage({ onStart, isLoading }: { onStart: () => void; isLoading: bool
         {/* Blog entry */}
         <Link
           href="/blog"
-          className="mt-5 flex items-center justify-center gap-2 py-3 px-6 bg-white/70 backdrop-blur-sm text-rose-500 text-sm font-medium rounded-2xl border border-rose-200/60 hover:bg-white hover:border-rose-300 hover:shadow-sm transition-all duration-200"
+          className="mt-5 flex items-center justify-center gap-2 py-3 px-6 bg-white/70 backdrop-blur-sm text-rose-500 text-sm font-semibold rounded-full border border-rose-200/60 hover:bg-white hover:border-rose-300 hover:shadow-sm transition-all duration-200"
         >
           <span>📖</span>
           <span>恋爱攻略</span>

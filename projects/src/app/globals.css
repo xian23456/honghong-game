@@ -205,6 +205,41 @@ body {
   animation: slide-up 0.3s ease-out;
 }
 
+/* ---------------------------------------------------------------
+   视觉优化（借鉴 cleanup.pictures 设计体系，适配粉色游戏风格）
+   --------------------------------------------------------------- */
+
+/* 全局平滑滚动 */
+html {
+  scroll-behavior: smooth;
+}
+
+/* 展示级标题：800 字重 + 收紧字距（参考站用付费字体，这里用字重替代） */
+.font-display {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+/* 深色胶囊高亮：用于标题中的关键词（白字） */
+.highlight-dark {
+  background-color: #1f2937;
+  color: #ffffff;
+  border-radius: 9999px;
+  padding: 0.2em 0.65em;
+  white-space: nowrap;
+  display: inline-block;
+}
+
+/* 主色胶囊高亮：用于标题中的关键词（主题粉色） */
+.highlight-rose {
+  background-color: #f43f5e;
+  color: #ffffff;
+  border-radius: 9999px;
+  padding: 0.2em 0.65em;
+  white-space: nowrap;
+  display: inline-block;
+}
+
 /* Scrollbar styling */
 .custom-scrollbar::-webkit-scrollbar {
   width: 4px;

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSupabaseClient } from "@/storage/database/supabase-client";
+import { eq } from "drizzle-orm";
+import { db } from "@/storage/database/db";
+import { users } from "@/storage/database/shared/schema";
 import { hashPassword, generateToken, setAuthCookie } from "@/lib/auth";
 
 export async function POST(request: NextRequest) {
@@ -27,16 +29,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = getSupabaseClient();
-
     // Check if username already exists
-    const { data: existing } = await supabase
-      .from("users")
-      .select("id")
-      .eq("username", username)
+    const [existing] = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(eq(users.username, username))
       .limit(1);
 
-    if (existing && existing.length > 0) {
+    if (existing) {
       return NextResponse.json(
         { error: "用户名已存在" },
         { status: 409 }
@@ -45,14 +45,12 @@ export async function POST(request: NextRequest) {
 
     // Hash password and create user
     const hashedPassword = await hashPassword(password);
-    const { data: newUser, error } = await supabase
-      .from("users")
-      .insert({ username, password: hashedPassword })
-      .select("id, username")
-      .single();
+    const [newUser] = await db
+      .insert(users)
+      .values({ username, password: hashedPassword })
+      .returning({ id: users.id, username: users.username });
 
-    if (error || !newUser) {
-      console.error("Register insert error:", error);
+    if (!newUser) {
       return NextResponse.json(
         { error: "注册失败，请稍后重试" },
         { status: 500 }
