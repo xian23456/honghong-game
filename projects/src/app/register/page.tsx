@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
+import { Turnstile } from '@marsidev/react-turnstile'
 
 export default function RegisterPage() {
   const [username, setUsername] = useState("");
@@ -9,6 +10,7 @@ export default function RegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -19,13 +21,19 @@ export default function RegisterPage() {
       return;
     }
 
+    // 人机验证未完成时不允许提交
+    if (!turnstileToken) {
+      setError("请先完成人机验证");
+      return;
+    }
+
     setLoading(true);
 
     try {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ username, password, turnstileToken }),
       });
 
       const data = await res.json();
@@ -109,6 +117,19 @@ export default function RegisterPage() {
                 {error}
               </div>
             )}
+
+            {/* 人机验证：在注册按钮的上方 */}
+            <Turnstile
+              siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
+              onSuccess={(token) => {
+                setTurnstileToken(token)
+              }}
+              onError={() => {
+                setTurnstileToken(null);
+                setError("人机验证加载失败，请重试");
+              }}
+              onExpire={() => setTurnstileToken(null)}
+            />
 
             <button
               type="submit"
