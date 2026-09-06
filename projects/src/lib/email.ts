@@ -1,11 +1,29 @@
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+// 懒加载：只在真正发信时才初始化，避免构建时因缺少环境变量而崩溃
+let cachedClient: Resend | null = null
+
+function getResendClient(): Resend | null {
+  const apiKey = process.env.RESEND_API_KEY
+  if (!apiKey) {
+    return null
+  }
+  if (!cachedClient) {
+    cachedClient = new Resend(apiKey)
+  }
+  return cachedClient
+}
 
 export async function sendWelcomeEmail(
   userEmail: string,
   userName: string
 ) {
+  const resend = getResendClient()
+  if (!resend) {
+    console.warn('未配置 RESEND_API_KEY，跳过欢迎邮件发送')
+    return
+  }
+
   await resend.emails.send({
     from: '纸片人男友 <onboarding@resend.dev>',
     to: userEmail,
