@@ -24,7 +24,8 @@ export async function sendWelcomeEmail(
     return
   }
 
-  await resend.emails.send({
+  // 新版 Resend SDK 失败时不抛异常，而是返回 { error }，必须主动检查
+  const { data, error } = await resend.emails.send({
     from: '纸片人男友 <onboarding@resend.dev>',
     to: userEmail,
     subject: '你好呀，我是你的专属男友 💌',
@@ -39,4 +40,11 @@ export async function sendWelcomeEmail(
       </div>
     `,
   })
+
+  if (error) {
+    console.error('欢迎邮件发送失败：', JSON.stringify(error))
+    throw new Error(`Resend 发信失败: ${JSON.stringify(error)}`)
+  }
+
+  console.log('欢迎邮件已提交发送：', userEmail, '邮件ID:', data?.id)
 }
