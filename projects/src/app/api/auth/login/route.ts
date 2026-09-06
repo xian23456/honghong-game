@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { eq } from "drizzle-orm";
+import { eq, or } from "drizzle-orm";
 import { db } from "@/storage/database/db";
 import { users } from "@/storage/database/shared/schema";
 import { verifyPassword, generateToken, setAuthCookie } from "@/lib/auth";
@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Find user
+    // Find user（用户名或邮箱均可登录）
     const [user] = await db
       .select({
         id: users.id,
@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
         password: users.password,
       })
       .from(users)
-      .where(eq(users.username, username))
+      .where(or(eq(users.username, username), eq(users.email, username)))
       .limit(1);
 
     if (!user) {

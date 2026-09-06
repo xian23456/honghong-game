@@ -23,6 +23,8 @@ export const users = pgTable("users", {
 	id: bigint({ mode: "number" }).primaryKey().generatedAlwaysAsIdentity({ name: "users_id_seq", startWith: 1, increment: 1, minValue: 1, maxValue: 9223372036854775807, cache: 1 }),
 	username: text().notNull(),
 	password: text().notNull(),
+	// 邮箱：用于注册、登录和接收欢迎邮件（老用户可能为空）
+	email: varchar({ length: 255 }).unique(),
 	// TODO: 最小角色系统，admin 可访问 /admin 后台（需手动在数据库中将用户 role 改为 admin）
 	role: varchar({ length: 20 }).notNull().default("user"),
 	// 账号状态：active=正常，banned=封禁
