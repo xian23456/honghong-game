@@ -5,7 +5,8 @@ const JWT_SECRET = process.env.JWT_SECRET || "honghong-simulator-secret-key-2024
 const COOKIE_NAME = "auth_token";
 
 // Public paths that don't require authentication
-const PUBLIC_PATHS = ["/login", "/register", "/api/auth", "/blog", "/leaderboard", "/api/blog", "/api/leaderboard"];
+// /api/cron 由接口内部的 CRON_SECRET 校验保护，不走登录中间件
+const PUBLIC_PATHS = ["/login", "/register", "/api/auth", "/blog", "/leaderboard", "/api/blog", "/api/leaderboard", "/api/cron"];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
