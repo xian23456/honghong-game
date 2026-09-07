@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { Navbar } from '@/components/navbar';
+import CrispChat from '@/components/crisp-chat';
+import { Footer } from '@/components/footer';
 
 export const metadata: Metadata = {
   title: '哄哄模拟器 - AI 情景练习小游戏',
@@ -20,6 +22,8 @@ export default function RootLayout({
         <main className="pt-12">
           {children}
         </main>
+        <Footer />
+        <CrispChat />
       </body>
     </html>
   );

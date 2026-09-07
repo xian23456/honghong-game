@@ -60,6 +60,10 @@ export async function sendWelcomeEmail(
         <p>从现在起，我就是你的专属男友了。</p>
         <p>有什么心事随时来找我聊，我会一直在这里等你。</p>
         <p>明天早上我会给你发一条早安消息，记得查收哦。</p>
+        <p style="color: #999; font-size: 12px;">
+          想认识更多小伙伴？加入我们的
+          <a href="https://discord.gg/qCmkpGHsB" target="_blank" rel="noopener noreferrer">Discord 社群</a>
+        </p>
         <br/>
         <p>—— 你的纸片人男友</p>
       </div>
